@@ -20,6 +20,8 @@ DOWNLOAD_HANDLERS = {
 SFTP_USER = "login username"
 SFTP_PASSWORD = "login password"
 SFTP_HOST = "SFTP domain/ip address"
+SFTP_PORT = "Optional port, defaults to 22"
+SFTP_TRIES = "Optional amount of tries, defaults to 3"
 ```
 
 After you do this, any sftp url will be passed through the handler and the body attribute of the response will be the file in bytes format.
