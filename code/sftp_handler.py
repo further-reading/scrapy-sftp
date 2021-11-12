@@ -1,10 +1,14 @@
-from scrapy.http import Response
-import paramiko
 from io import BytesIO
+
+import paramiko
 import yarl
+from scrapy.responsetypes import responsetypes
+from scrapy.utils.decorators import defers
 
 
 class SFTPHandler:
+    lazy = False
+
     @classmethod
     def from_crawler(cls, crawler):
         username = crawler.settings.get("SFTP_USER")
@@ -21,6 +25,7 @@ class SFTPHandler:
             host,
         )
 
+    @defers
     def download_request(self, request, spider):
         url = yarl.URL(request.url)
         path = url.path
@@ -28,11 +33,9 @@ class SFTPHandler:
             self.sftp.getfo(path, stream)
             stream.seek(0)
             body = stream.getvalue()
-        response = Response(
-            url=request.url,
-            body=body,
-        )
-        return response
+
+        respcls = responsetypes.from_args(filename=path, body=body)
+        return respcls(url=request.url, body=body)
 
     def make_sftp_connection(self, username, password, port, host):
         t = paramiko.Transport((host, port))
